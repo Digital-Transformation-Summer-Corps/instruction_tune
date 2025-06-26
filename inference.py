@@ -1,6 +1,12 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 from peft import PeftModel
+import argparse
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(description="Interactive LLaMA inference with optional LoRA adapters")
+parser.add_argument("--use-lora", action="store_true", help="Use LoRA fine-tuned adapters")
+args = parser.parse_args()
 
 # Model paths
 base_model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.1-8b-sagemaker-pretrained"  # Base model
@@ -17,10 +23,14 @@ base_model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True
 )
 
-print("Loading LoRA adapters...")
-model = PeftModel.from_pretrained(base_model, adapter_path)
+if args.use_lora:
+    print("Loading LoRA adapters...")
+    model = PeftModel.from_pretrained(base_model, adapter_path)
+    print("Model with LoRA adapters loaded successfully! Type 'end' to quit.")
+else:
+    model = base_model
+    print("Using base model (no LoRA adapters). Type 'end' to quit.")
 
-print("Model with LoRA adapters loaded successfully! Type 'end' to quit.")
 print("-" * 50)
 
 # Interactive loop
