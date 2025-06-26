@@ -1,17 +1,26 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+from peft import PeftModel
 
-# Load tokenizer and model
-model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.18b-sagemaker-pretrained-alpaca-ft"  # Replace with your actual path
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-model = AutoModelForCausalLM.from_pretrained(
-    model_path,
+# Model paths
+base_model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.1-8b-sagemaker-pretrained"  # Base model
+adapter_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.18b-sagemaker-pretrained-alpaca-ft"  # LoRA adapters
+
+print("Loading tokenizer from base model...")
+tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+
+print("Loading base model...")
+base_model = AutoModelForCausalLM.from_pretrained(
+    base_model_path,
     torch_dtype=torch.float16,  # Use half precision to save memory
     device_map="auto",  # Automatically distribute across GPUs if available
     trust_remote_code=True
 )
 
-print("Model loaded successfully! Type 'end' to quit.")
+print("Loading LoRA adapters...")
+model = PeftModel.from_pretrained(base_model, adapter_path)
+
+print("Model with LoRA adapters loaded successfully! Type 'end' to quit.")
 print("-" * 50)
 
 # Interactive loop
