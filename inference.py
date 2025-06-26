@@ -2,7 +2,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
 # Load tokenizer and model
-model_path = "D:\dt-summer-corp\llamas\llama3.1-8b-sagemaker-pretrained"  # Replace with your actual path
+model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.1-8b-sagemaker-pretrained-alpaca-ft"  # Replace with your actual path
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForCausalLM.from_pretrained(
     model_path,
@@ -11,18 +11,47 @@ model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True
 )
 
-# Example inference
-prompt = "The future of AI is"
-inputs = tokenizer(prompt, return_tensors="pt")
-inputs.to("cuda")
-with torch.no_grad():
-    outputs = model.generate(
-        inputs.input_ids,
-        max_length=100,
-        temperature=0.7,
-        do_sample=True,
-        pad_token_id=tokenizer.eos_token_id
-    )
-    outputs.to("cpu")
-response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-print(response)
+print("Model loaded successfully! Type 'end' to quit.")
+print("-" * 50)
+
+# Interactive loop
+while True:
+    # Get user input
+    prompt = input("\nYour question: ").strip()
+    
+    # Check if user wants to end the conversation
+    if prompt.lower() == "end":
+        print("Goodbye!")
+        break
+    
+    # Skip empty inputs
+    if not prompt:
+        print("Please enter a question or type 'end' to quit.")
+        continue
+    
+    # Generate response
+    try:
+        inputs = tokenizer(prompt, return_tensors="pt")
+        inputs = {k: v.to("cuda") for k, v in inputs.items()}
+        
+        with torch.no_grad():
+            outputs = model.generate(
+                inputs["input_ids"],
+                max_length=100,
+                temperature=0.7,
+                do_sample=True,
+                pad_token_id=tokenizer.eos_token_id,
+                attention_mask=inputs.get("attention_mask")
+            )
+        
+        # Decode and print response
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        # Remove the original prompt from the response
+        response = response[len(prompt):].strip()
+        
+        print(f"\nResponse: {response}")
+        print("-" * 50)
+        
+    except Exception as e:
+        print(f"Error generating response: {e}")
+        print("Please try again or type 'end' to quit.")
