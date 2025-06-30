@@ -21,7 +21,7 @@ SYSTEM_PROMPT_TEMPLATE = f"You are a helpful assistant that can answer questions
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description="Interactive LLaMA inference with optional LoRA adapters")
-parser.add_argument("--use-lora", action="store_true", default=True, help="Use LoRA fine-tuned adapters")
+parser.add_argument("--use-lora", action="store_true", help="Use LoRA fine-tuned adapters")
 args = parser.parse_args()
 
 # Model paths
