@@ -76,7 +76,7 @@ while True:
         with torch.no_grad():
             system_outputs = model.generate(
                 tokenized_context_retrieval_prompt["input_ids"],
-                max_length=100,
+                max_length=1000,
                 temperature=0.7,
                 do_sample=True,
                 pad_token_id=tokenizer.eos_token_id,
@@ -107,7 +107,7 @@ while True:
         with torch.no_grad():
             outputs = model.generate(
                 inputs["input_ids"],
-                max_length=100,
+                max_length=3500,
                 temperature=0.7,
                 do_sample=True,
                 pad_token_id=tokenizer.eos_token_id,
