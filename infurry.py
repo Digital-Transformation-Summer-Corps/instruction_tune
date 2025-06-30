@@ -12,7 +12,7 @@ summaries = {
 }
 
 # Concatenate summaries into a single string
-summaries_str = "\n".join([f"{title}: \n{summary}\n\n" for title, summary in enumerate(summaries)])
+summaries_str = "\n".join([f"{title}: \n{summary}\n\n" for title, summary in summaries.items()])
 
 # SYSTEM PROMPT
 CONTEXT_RETRIEVAL_TEMPLATE = f"Based on this list of summaries: {summaries_str}, list the titles of the summaries most relevant to the question: {{question}}. Do not list more than 3 summaries. Please list the titles in a comma separated list, e.g., 'title1, title2, title3'."
