@@ -8,7 +8,9 @@ import os
 
 # LIST OF SUMMARIES
 summaries = {
-    "1": "The first summary",
+    "Compute1 Quickstart": "This guide provides a hands-on overview for users accessing the Compute1 HPC platform. It covers connecting via SSH and VPN, using the Open OnDemand (OOD) web portal for launching applications (like Jupyter or MATLAB), and navigating job sessions. It also explains how to use the RIS Desktop environment via THPC modules, customize Docker containers with the noVNC image, and optionally connect through a local VNC viewer. It includes practical instructions on configuring storage paths, setting job parameters (like CPUs, memory, GPUs), and launching interactive sessions within the OOD interface.",
+    "Compute2 Quickstart": "This document serves as a practical starting guide for the newer Compute2 platform, which uses Slurm instead of LSF. It walks users through SSH access, VPN setup, and command-line interaction. It introduces the Slurm job scheduler with example usage of srun, sbatch, squeue, and scancel, including options for requesting GPUs, memory, and using Docker containers via Pyxis. It also includes guidance on job arrays, GPU testing with PyTorch, and container storage mounting. The content is oriented toward command-line workflows and assumes moderate familiarity with HPC environments.",
+    "Docker Basics: Building, Tagging, & Pushing A Custom Docker Image": "This step-by-step tutorial walks through building a custom Docker image with Python, R, and Git. It explains best practices like choosing a minimal base image, installing dependencies with apt-get, importing code via Git or COPY, and tagging images. It provides command examples for building, running, and pushing Docker containers. The tutorial emphasizes testing locally before deploying on Compute1, and ends with instructions on running Docker containers via the LSF job scheduler.",
 }
 
 # Concatenate summaries into a single string
