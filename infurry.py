@@ -17,7 +17,7 @@ summaries = {
 summaries_str = "\n".join([f"Title: {title} \n Summary:{summary}\n\n" for title, summary in summaries.items()])
 
 # SYSTEM PROMPT
-CONTEXT_RETRIEVAL_TEMPLATE = f"What is the title of the summary that is most relevant to the query '{{question}}' in the following summaries: {summaries_str}. It is incredibly important that you only return the title of a single summary, not the summary itself, or multiple titles."
+CONTEXT_RETRIEVAL_TEMPLATE = f"Given these summaries: {summaries_str}\n\nQuestion: {{question}}\n\nReturn only the exact title of the most relevant summary (no explanations, no other text):"
 
 SYSTEM_PROMPT_TEMPLATE = f"You are a helpful assistant that can answer questions about the following context: {{context}}. Please answer the question: {{question}}."
 
@@ -100,11 +100,12 @@ while True:
         with torch.no_grad():
             system_outputs = model.generate(
                 tokenized_context_retrieval_prompt["input_ids"],
-                max_length=1000,
-                temperature=0.7,
+                max_new_tokens=20,  # Limit to just a few tokens for the title
+                temperature=0.3,    # Lower temperature for more focused response
                 do_sample=True,
                 pad_token_id=tokenizer.eos_token_id,
-                attention_mask=tokenized_context_retrieval_prompt.get("attention_mask")
+                attention_mask=tokenized_context_retrieval_prompt.get("attention_mask"),
+                repetition_penalty=1.2  # Prevent repetition
             )
         
         # Decode and print system response
@@ -125,7 +126,7 @@ while True:
         # for title in titles:
         #     with open(os.path.join("RIS_docs/", title), "r") as f:
         #         context += f"{f.read()}\n\n"
-        with open(os.path.join("RIS_docs/", title), "r") as f:
+        with open(os.path.join("RIS_docs/", title + ".md"), "r") as f:
             context += f"{f.read()}\n\n"
 
         system_prompt = SYSTEM_PROMPT_TEMPLATE.format(context=context, question=prompt)
