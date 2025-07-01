@@ -22,32 +22,32 @@ CONTEXT_RETRIEVAL_TEMPLATE = f"Based on this list of summaries: {summaries_str},
 SYSTEM_PROMPT_TEMPLATE = f"You are a helpful assistant that can answer questions about the following context: {{context}}. Please answer the question: {{question}}."
 
 # Parse command line arguments
-parser = argparse.ArgumentParser(description="Interactive LLaMA inference with optional LoRA adapters")
-parser.add_argument("--use-lora", action="store_true", help="Use LoRA fine-tuned adapters")
-args = parser.parse_args()
+# parser = argparse.ArgumentParser(description="Interactive LLaMA inference with optional LoRA adapters")
+# parser.add_argument("--use-lora", action="store_true", help="Use LoRA fine-tuned adapters")
+# args = parser.parse_args()
 
 # Model paths
-base_model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.1-8b-sagemaker-pretrained"  # Base model
-adapter_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.18b-sagemaker-pretrained-alpaca-ft"  # LoRA adapters
+base_model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama-3.1-8b-instruct"  # Base model
+# adapter_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.18b-sagemaker-pretrained-alpaca-ft"  # LoRA adapters
 
 print("Loading tokenizer from base model...")
 tokenizer = AutoTokenizer.from_pretrained(base_model_path)
 
 print("Loading base model...")
 base_model = AutoModelForCausalLM.from_pretrained(
-    base_model_path,
+    base_model_path if len(os.listdir(base_model_path)) > 0 else "meta-llama/Llama-3.1-8B-Instruct",
     torch_dtype=torch.float16,  # Use half precision to save memory
     device_map="auto",  # Automatically distribute across GPUs if available
     trust_remote_code=True
 )
 
-if args.use_lora:
-    print("Loading LoRA adapters...")
-    model = PeftModel.from_pretrained(base_model, adapter_path)
-    print("Model with LoRA adapters loaded successfully! Type 'end' to quit.")
-else:
-    model = base_model
-    print("Using base model (no LoRA adapters). Type 'end' to quit.")
+# if args.use_lora:
+#     print("Loading LoRA adapters...")
+#     model = PeftModel.from_pretrained(base_model, adapter_path)
+#     print("Model with LoRA adapters loaded successfully! Type 'end' to quit.")
+# else:
+model = base_model
+print("Using base model (no LoRA adapters). Type 'end' to quit.")
 
 print("-" * 50)
 
