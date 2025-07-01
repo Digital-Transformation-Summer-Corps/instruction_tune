@@ -28,6 +28,7 @@ SYSTEM_PROMPT_TEMPLATE = f"You are a helpful assistant that can answer questions
 
 # Model paths
 base_model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama-3.1-8b-instruct"  # Base model
+cache_dir = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/hf_cache"
 # adapter_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.18b-sagemaker-pretrained-alpaca-ft"  # LoRA adapters
 
 # print("Loading tokenizer from base model...")
@@ -53,6 +54,7 @@ base_model = AutoModelForCausalLM.from_pretrained(
     "meta-llama/Llama-3.1-8B-Instruct",
     torch_dtype=torch.float16,  # Use half precision to save memory
     device_map="auto",  # Automatically distribute across GPUs if available
+    cache_dir=cache_dir,
     trust_remote_code=True
 )
 
