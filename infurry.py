@@ -31,16 +31,27 @@ base_model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/l
 # adapter_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.18b-sagemaker-pretrained-alpaca-ft"  # LoRA adapters
 
 print("Loading tokenizer from base model...")
-tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+if os.path.exists(base_model_path) and len(os.listdir(base_model_path)) > 0: 
+    tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+else:
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B-Instruct")
 
 print("Loading base model...")
-base_model = AutoModelForCausalLM.from_pretrained(
-    base_model_path if len(os.listdir(base_model_path)) > 0 else "meta-llama/Llama-3.1-8B-Instruct",
-    torch_dtype=torch.float16,  # Use half precision to save memory
-    device_map="auto",  # Automatically distribute across GPUs if available
-    trust_remote_code=True
-)
-
+if os.path.exists(base_model_path) and len(os.listdir(base_model_path)) > 0: 
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_path,
+        torch_dtype=torch.float16,  # Use half precision to save memory
+        device_map="auto",  # Automatically distribute across GPUs if available
+        trust_remote_code=True
+    )
+else:
+    base_model = AutoModelForCausalLM.from_pretrained(
+        "meta-llama/Llama-3.1-8B-Instruct",
+        torch_dtype=torch.float16,  # Use half precision to save memory
+        device_map="auto",  # Automatically distribute across GPUs if available
+        cache_dir=base_model_path,
+        trust_remote_code=True
+    )
 # if args.use_lora:
 #     print("Loading LoRA adapters...")
 #     model = PeftModel.from_pretrained(base_model, adapter_path)
