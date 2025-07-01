@@ -14,10 +14,10 @@ summaries = {
 }
 
 # Concatenate summaries into a single string
-summaries_str = "\n".join([f"{title}: \n{summary}\n\n" for title, summary in summaries.items()])
+summaries_str = "\n".join([f"Title: {title} \n Summary:{summary}\n\n" for title, summary in summaries.items()])
 
 # SYSTEM PROMPT
-CONTEXT_RETRIEVAL_TEMPLATE = f"Based on this list of summaries: {summaries_str}, list the titles of the summaries most relevant to the question: {{question}}. Do not list more than 3 summaries. Please list the titles in a comma separated list, e.g., 'title1, title2, title3'."
+CONTEXT_RETRIEVAL_TEMPLATE = f"What is the title of the summary that is most relevant to the query '{{question}}' in the following summaries: {summaries_str}. It is incredibly important that you only return the title of a single summary, not the summary itself, or multiple titles."
 
 SYSTEM_PROMPT_TEMPLATE = f"You are a helpful assistant that can answer questions about the following context: {{context}}. Please answer the question: {{question}}."
 
@@ -98,17 +98,22 @@ while True:
         response = tokenizer.decode(system_outputs[0], skip_special_tokens=True)
         # Remove the original prompt from the response
         response = response[len(context_retrieval_prompt):].strip()
+        print(f"Model response to context retrieval prompt: {response}\n")
         print(f"\nRetrieving the following pages:")
-        titles = response.split(",")
-        titles = [title.strip() for title in titles]
-        for title in titles:
-            print(f"- {title}")
+        # titles = response.split(",")
+        # titles = [title.strip() for title in titles]
+        title = response.strip()
+        # for title in titles:
+        #     print(f"- {title}")
+        print(f"- {title}")
         print("-" * 50)
 
         context = "\n"
-        for title in titles:
-            with open(os.path.join("RIS_docs/", title), "r") as f:
-                context += f"{f.read()}\n\n"
+        # for title in titles:
+        #     with open(os.path.join("RIS_docs/", title), "r") as f:
+        #         context += f"{f.read()}\n\n"
+        with open(os.path.join("RIS_docs/", title), "r") as f:
+            context += f"{f.read()}\n\n"
 
         system_prompt = SYSTEM_PROMPT_TEMPLATE.format(context=context, question=prompt)
 
