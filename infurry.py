@@ -21,55 +21,45 @@ CONTEXT_RETRIEVAL_TEMPLATE = f"Given these summaries: {summaries_str}\n\nQuestio
 
 SYSTEM_PROMPT_TEMPLATE = f"You are a helpful assistant that can answer questions about the following context: {{context}}. Please answer the question: {{question}}."
 
-# Parse command line arguments
-# parser = argparse.ArgumentParser(description="Interactive LLaMA inference with optional LoRA adapters")
-# parser.add_argument("--use-lora", action="store_true", help="Use LoRA fine-tuned adapters")
-# args = parser.parse_args()
-
 # Model paths
 base_model_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama-3.1-8b-instruct"  # Base model
 cache_dir = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/hf_cache"
 # adapter_path = "/storage2/fs1/dt-summer-corp/Active/common/users/c.daedalus/llamas/llama3.18b-sagemaker-pretrained-alpaca-ft"  # LoRA adapters
 
-# print("Loading tokenizer from base model...")
-# if os.path.exists(base_model_path) and len(os.listdir(base_model_path)) > 0: 
-#     print("Loading tokenizer from local path...")
-#     tokenizer = AutoTokenizer.from_pretrained(base_model_path)
-# else:
-#     print("Downloading tokenizer from HuggingFace...")
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B-Instruct")
+print("Loading tokenizer from base model...")
+if os.path.exists(base_model_path) and len(os.listdir(base_model_path)) > 0: 
+    print("Loading tokenizer from local path...")
+    tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+else:
+    print("Downloading tokenizer from HuggingFace...")
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B-Instruct")
 
-# print("Loading base model...")
-# if os.path.exists(base_model_path) and len(os.listdir(base_model_path)) > 0: 
-#     print("Loading base model from local path...")
-#     base_model = AutoModelForCausalLM.from_pretrained(
-#         base_model_path,
-#         torch_dtype=torch.float16,  # Use half precision to save memory
-#         device_map="auto",  # Automatically distribute across GPUs if available
-#         trust_remote_code=True
-#     )
-# else:
-print("Downloading model from HuggingFace...")
-base_model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.1-8B-Instruct",
-    torch_dtype=torch.float16,  # Use half precision to save memory
-    device_map="auto",  # Automatically distribute across GPUs if available
-    cache_dir=cache_dir,
-    trust_remote_code=True
-)
+print("Loading base model...")
+if os.path.exists(base_model_path) and len(os.listdir(base_model_path)) > 0: 
+    print("Loading base model from local path...")
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_path,
+        torch_dtype=torch.float16,  # Use half precision to save memory
+        device_map="auto",  # Automatically distribute across GPUs if available
+        trust_remote_code=True
+    )
+else:
+    print("Downloading model from HuggingFace...")
+    base_model = AutoModelForCausalLM.from_pretrained(
+        "meta-llama/Llama-3.1-8B-Instruct",
+        torch_dtype=torch.float16,  # Use half precision to save memory
+        device_map="auto",  # Automatically distribute across GPUs if available
+        cache_dir=cache_dir,
+        trust_remote_code=True
+    )
 
-# Save the model and tokenizer to the local path for future use
-print(f"Saving model to {base_model_path} for future use...")
-os.makedirs(base_model_path, exist_ok=True)
-base_model.save_pretrained(base_model_path)
-tokenizer.save_pretrained(base_model_path)
-print("Model saved successfully!")
+    # Save the model and tokenizer to the local path for future use
+    print(f"Saving model to {base_model_path} for future use...")
+    os.makedirs(base_model_path, exist_ok=True)
+    base_model.save_pretrained(base_model_path)
+    tokenizer.save_pretrained(base_model_path)
+    print("Model saved successfully!")
 
-# if args.use_lora:
-#     print("Loading LoRA adapters...")
-#     model = PeftModel.from_pretrained(base_model, adapter_path)
-#     print("Model with LoRA adapters loaded successfully! Type 'end' to quit.")
-# else:
 model = base_model
 print("Using base model (no LoRA adapters). Type 'end' to quit.")
 
@@ -116,7 +106,7 @@ while True:
         print(f"\nRetrieving the following pages:")
         # titles = response.split(",")
         # titles = [title.strip() for title in titles]
-        title = response.strip()
+        title = response.strip().split("\n")[0]
         # for title in titles:
         #     print(f"- {title}")
         print(f"- {title}")
